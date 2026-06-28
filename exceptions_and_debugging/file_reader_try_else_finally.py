@@ -122,5 +122,54 @@ Explanation:
   (lines_read becomes 1), then "abc" raises
   ValueError, which is caught and reported.
 =================================================
+def read_numbers(path):
+    """
+    Reads a text file containing one number per line and returns the sum.
 
+    Demonstrates try / except / else / finally.
+
+    Args:
+        path (str): Path to the file.
+
+    Returns:
+        tuple: (status, value_or_message, lines_read)
+            status: "ok" or "error"
+            value_or_message: sum (float) on success, error message on error
+            lines_read: number of lines successfully parsed before any error
+    """
+    lines_read = 0
+    total = 0.0
+
+    try:
+        # ---- try block: code that might fail ----
+        with open(path, 'r') as f:
+            for line in f:
+                # Convert line to float; raises ValueError if invalid.
+                num = float(line.strip())
+                total += num
+                lines_read += 1
+
+    # ---- except blocks: handle specific exceptions ----
+    except FileNotFoundError:
+        return ('error', f'File not found: {path}', 0)
+
+    except PermissionError:
+        return ('error', f'Permission denied: {path}', 0)
+
+    except ValueError:
+        # lines_read holds the count of lines parsed successfully before the error.
+        return ('error', 'Invalid number on a line', lines_read)
+
+    except Exception as e:
+        # Catch any other unexpected exception.
+        return ('error', str(e), lines_read)
+
+    else:
+        # ---- else block: runs only if no exception was raised ----
+        # All lines were parsed successfully; return the sum.
+        return ('ok', total, lines_read)
+
+    finally:
+        # ---- finally block: always runs ----
+        print("Done reading")
 """
