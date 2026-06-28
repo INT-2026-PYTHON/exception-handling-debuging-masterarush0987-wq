@@ -135,5 +135,96 @@ Explanation:
 - The strict version re-raises a RuntimeError
   summarising the total number of failures.
 =================================================
+def process_records(records):
+    """
+    Processes a list of messy user records.
 
+    Args:
+        records (list): List of dictionaries (or other types) with keys 'name', 'age', 'score'.
+
+    Returns:
+        tuple: (clean_records, error_log)
+            clean_records: list of dicts with name (str), age (int), score (float)
+            error_log: list of tuples (index, exception_class_name, message)
+    """
+    clean_records = []
+    error_log = []
+
+    for idx, record in enumerate(records):
+        try:
+            # ---- try block: operations that might raise exceptions ----
+            name = record["name"]          # May raise KeyError or TypeError
+            age_str = record["age"]        # May raise KeyError or TypeError
+            score_str = record["score"]    # May raise KeyError or TypeError
+
+            age = int(age_str)             # May raise ValueError
+            score = float(score_str)       # May raise ValueError
+
+        except (KeyError, TypeError) as e:
+            # ---- Catching multiple exception types in one except block ----
+            # Log the error with the exception class name and its message.
+            error_log.append((idx, type(e).__name__, str(e)))
+
+        except ValueError as e:
+            # ---- Separate except for ValueError, using 'as e' to inspect ----
+            error_log.append((idx, type(e).__name__, str(e)))
+
+        else:
+            # ---- else block: runs only if no exception was raised ----
+            # The record is clean; append the converted values.
+            clean_records.append({
+                "name": name,
+                "age": age,
+                "score": score
+            })
+
+    return clean_records, error_log
+
+
+def process_strict(records):
+    """
+    Wrapper for process_records that raises a RuntimeError if any error occurred.
+
+    Args:
+        records (list): List of records.
+
+    Returns:
+        tuple: (clean_records, error_log) if no errors.
+
+    Raises:
+        RuntimeError: If one or more records failed to process.
+    """
+    clean_records, error_log = process_records(records)
+
+    if error_log:
+        # ---- Re-raise a new exception, suppressing the original traceback ----
+        raise RuntimeError(f"{len(error_log)} record(s) failed to process") from None
+
+    return clean_records, error_log
+
+
+# ========== DRIVER CODE (testing with the given example) ==========
+
+if __name__ == "__main__":
+    records = [
+        {"name": "Alice", "age": "25",   "score": "88.5"},
+        {"name": "Bob",   "age": "abc",  "score": "70"},
+        {"name": "Carol", "age": "30"},                       # missing "score"
+        "not a dict",                                          # wrong type
+        {"name": "Dan",   "age": "40",   "score": "55.5"},
+    ]
+
+    # Call process_records
+    clean, errors = process_records(records)
+    print("Clean Records:")
+    print(clean)
+    print("\nError Log:")
+    print(errors)
+
+    # Call process_strict and catch the RuntimeError
+    print("\nStrict mode raised:")
+    try:
+        process_strict(records)
+    except RuntimeError as e:
+        print(e)
 """
