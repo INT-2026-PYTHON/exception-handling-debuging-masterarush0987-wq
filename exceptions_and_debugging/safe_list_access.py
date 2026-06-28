@@ -75,5 +75,41 @@ Output Example 3:
 ('error', 'Index must be an int')
 
 =================================================
+def safe_get(items, index):
+    """
+    Safely retrieves an element from a list by index.
 
+    Args:
+        items (list): The list to access.
+        index (int): The index to retrieve.
+
+    Returns:
+        tuple: (status, value_or_message)
+            status: "ok" or "error"
+            value_or_message: the value at that index on success,
+                              or an error message on failure.
+    """
+    try:
+        # Attempt to access the list – may raise IndexError or TypeError
+        value = items[index]
+        return ("ok", value)
+
+    except IndexError:
+        # Index is out of valid range
+        return ("error", "Index out of range")
+
+    except TypeError:
+        # Index is not an integer (e.g., a string, float, etc.)
+        return ("error", "Index must be an int")
+
+    except Exception as e:
+        # Catch any other unexpected error (e.g., items is not a list)
+        return ("error", f"Unexpected error: {e}")
+
+
+# ========== DRIVER CODE (for demonstration) ==========
+if __name__ == "__main__":
+    print(safe_get([10, 20, 30, 40], 2))   # ('ok', 30)
+    print(safe_get([10, 20, 30], 7))       # ('error', 'Index out of range')
+    print(safe_get([10, 20, 30], "1"))     # ('error', 'Index must be an int')
 """
