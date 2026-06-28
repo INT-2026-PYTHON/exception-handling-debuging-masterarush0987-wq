@@ -61,5 +61,54 @@ Output Example 3:
 ('error', 'Inputs must be numbers')
 Calculation finished
 =================================================
+def safe_divide(a, b):
+    """
+    Safely divides two numbers, handling common errors.
 
+    Args:
+        a (str): First number as a string.
+        b (str): Second number as a string.
+
+    Returns:
+        tuple: (status, value_or_message)
+            status: "ok" or "error"
+            value_or_message: result (float) on success, error message on failure.
+    """
+    try:
+        # Convert inputs to float – may raise ValueError
+        num_a = float(a)
+        num_b = float(b)
+
+        # Perform division – may raise ZeroDivisionError
+        result = num_a / num_b
+
+        # If we reach here, success
+        return ("ok", result)
+
+    except ValueError:
+        # Non‑numeric input
+        return ("error", "Inputs must be numbers")
+
+    except ZeroDivisionError:
+        # Division by zero
+        return ("error", "Cannot divide by zero")
+
+    except Exception as e:
+        # Any other unexpected error – capture its message
+        return ("error", str(e))
+
+
+# ========== DRIVER CODE (for demonstration) ==========
+if __name__ == "__main__":
+    # Example 1
+    print(safe_divide("10", "2"))
+    print("Calculation finished")
+
+    # Example 2
+    print(safe_divide("10", "0"))
+    print("Calculation finished")
+
+    # Example 3
+    print(safe_divide("ten", "2"))
+    print("Calculation finished")
 """
